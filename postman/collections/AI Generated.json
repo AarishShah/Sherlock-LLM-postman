@@ -6,7 +6,1009 @@
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_uid": "52786622-08851fe4-e344-466c-8996-0be19dd3d046"
 	},
-	"item": [],
+	"item": [
+		{
+			"name": "Sherlock Flask API",
+			"description": "Endpoints for the Flask monolith providing chat, character, and local model inference capabilities.",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": "JSON body type"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"password123\",\n  \"email\": \"test@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"register"
+							]
+						},
+						"description": "Registers a new user. Body constraints: Must include `username`, `password`, and `email` fields (strings)."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"originalRequest": {
+								"method": "POST",
+								"url": {
+									"raw": "{{base_url}}/register"
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"password123\",\n  \"email\": \"test@example.com\"\n}"
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n  \"success\": true,\n  \"message\": \"Registration successful\"\n}"
+						},
+						{
+							"name": "Validation Error",
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"body": "{\n  \"success\": false,\n  \"message\": \"Username or email already exists\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": "JSON body type"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"login"
+							]
+						},
+						"description": "Authenticates a user and sets a session cookie. Body constraints: `username` and `password` required strings."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n  \"success\": true,\n  \"message\": \"Login successful\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"logout"
+							]
+						},
+						"description": "Logs out the current user session."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"status": "Found",
+							"code": 302,
+							"_postman_previewlanguage": "html",
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "Get User Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/user",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"user"
+							]
+						},
+						"description": "Returns authentication status and username if logged in."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n  \"logged_in\": true,\n  \"username\": \"testuser\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Create Chat",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 || pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    if (response.id) {",
+									"        pm.environment.set('resourceId', response.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": "JSON Body"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"New Chat\",\n  \"preview\": \"Hello\",\n  \"full_content\": \"Hello World\",\n  \"character\": \"Sherlock\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/chats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"chats"
+							]
+						},
+						"description": "Creates a new chat. Body fields: `title`, `preview`, `full_content`, `character`."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"body": "{\n  \"message\": \"Chat saved/updated successfully\",\n  \"id\": 123\n}"
+						},
+						{
+							"name": "Validation Error",
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"body": "{\n  \"error\": \"Missing required fields\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get All Chats",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/chats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"chats"
+							]
+						},
+						"description": "Retrieves a list of chats for the current user."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "[\n  {\n    \"id\": 123,\n    \"title\": \"New Chat\",\n    \"preview\": \"Hello\",\n    \"created_at\": \"2026-03-02T04:24:53\",\n    \"character\": \"Sherlock\"\n  }\n]"
+						}
+					]
+				},
+				{
+					"name": "Get Chat by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/chats/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"chats",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{resourceId}}",
+									"description": "Chat ID"
+								}
+							]
+						},
+						"description": "Retrieves a specific chat."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n  \"id\": 123,\n  \"title\": \"New Chat\",\n  \"full_content\": \"Hello World\",\n  \"character\": \"Sherlock\",\n  \"created_at\": \"2026-03-02T04:24:53\"\n}"
+						},
+						{
+							"name": "Not Found",
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "html",
+							"body": "Not found"
+						}
+					]
+				},
+				{
+					"name": "Update Chat by ID",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": "JSON Type"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Updated\",\n  \"preview\": \"Hi\",\n  \"full_content\": \"Hi there\",\n  \"character\": \"Watson\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/chats/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"chats",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{resourceId}}",
+									"description": "Chat ID"
+								}
+							]
+						},
+						"description": "Updates a specific chat. Requires `title`, `preview`, `full_content`, `character`."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n  \"message\": \"Chat saved/updated successfully\",\n  \"id\": 123\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete Chat by ID",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/chats/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"chats",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{resourceId}}",
+									"description": "Chat ID"
+								}
+							]
+						},
+						"description": "Deletes a specific chat."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n  \"message\": \"Chat deleted successfully\"\n}"
+						},
+						{
+							"name": "Not Found",
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"body": "{\n  \"error\": \"404 Not Found\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Characters",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/get_characters",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"get_characters"
+							]
+						},
+						"description": "Retrieves list of saved characters."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "[\n  {\n    \"name\": \"Sherlock\",\n    \"description\": \"Detective\"\n  }\n]"
+						}
+					]
+				},
+				{
+					"name": "Save Character",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 || pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    if (response.name) {",
+									"        pm.environment.set('resourceId', response.name);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": "JSON Type"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Watson\",\n  \"description\": \"Doctor\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/save_character",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"save_character"
+							]
+						},
+						"description": "Creates or updates a character. Requires `name`."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"body": "{\n  \"name\": \"Watson\",\n  \"description\": \"Doctor\"\n}"
+						},
+						{
+							"name": "Error",
+							"status": "Server Error",
+							"code": 500,
+							"_postman_previewlanguage": "json",
+							"body": "{\n  \"error\": \"Exception desc\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Load Local Model",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/load_local_model",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"load_local_model"
+							]
+						},
+						"description": "Triggers background loading of local AI model."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"status": "Accepted",
+							"code": 202,
+							"_postman_previewlanguage": "json",
+							"body": "{\n  \"message\": \"Model loading started\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Check Model Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/check_model_status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"check_model_status"
+							]
+						},
+						"description": "Checks if the local model is loaded."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n  \"status\": \"ready\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Unload Local Model",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/unload_local_model",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"unload_local_model"
+							]
+						},
+						"description": "Unloads the local AI model."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n  \"message\": \"Model unloaded successfully\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Local Model Inference",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": "JSON Type"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"hello\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/local_model_inference",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"local_model_inference"
+							]
+						},
+						"description": "Runs inference on local model. Requires `messages` array in body."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n  \"response\": \"Hi\",\n  \"formatted_prompt\": \"...\"\n}"
+						},
+						{
+							"name": "Error",
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"body": "{\n  \"error\": \"Model is not ready\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Sherlock Next.js API",
+			"description": "Endpoints for the Next.js full-stack application providing chats, authentication, and OpenRouter AI chat completions.",
+			"item": [
+				{
+					"name": "Auth Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": "JSON format"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Authenticates a user and sets a secure `session` cookie. Needs `username` and `password` strings."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n  \"success\": true,\n  \"message\": \"Login successful\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Auth Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"newuser\",\n  \"email\": \"new@test.com\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						},
+						"description": "Registers a user. Requires `username`, `email`, and `password`."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n  \"success\": true,\n  \"message\": \"Registration successful\"\n}"
+						},
+						{
+							"name": "Error",
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"body": "{\n  \"success\": false,\n  \"message\": \"Username or email already exists\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Auth Logout",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/auth/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						},
+						"description": "Deletes the session cookie and redirects."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"status": "Found",
+							"code": 302,
+							"_postman_previewlanguage": "html",
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "Get Characters",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/characters",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"characters"
+							]
+						},
+						"description": "Gets all characters from MongoDB."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "[\n  {\n    \"_id\": \"60f1b2b3b3b3b3b3b3b3b3\",\n    \"name\": \"Sherlock\",\n    \"description\": \"Detective\"\n  }\n]"
+						}
+					]
+				},
+				{
+					"name": "Create Character",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 || pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    if (response._id) {",
+									"        pm.environment.set('resourceId', response._id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Watson\",\n  \"description\": \"Doctor\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/characters",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"characters"
+							]
+						},
+						"description": "Upserts a character by name."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"body": "{\n  \"_id\": \"60f1c2c3\",\n  \"name\": \"Watson\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get All Chats",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/chats?type=roleplay",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"chats"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "roleplay",
+									"description": "Optional chat type filter"
+								}
+							]
+						},
+						"description": "Get all chats for session user."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "[\n  {\n    \"id\": \"chat123\",\n    \"title\": \"Test\"\n  }\n]"
+						}
+					]
+				},
+				{
+					"name": "Create Chat",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 || pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    if (response.id) {",
+									"        pm.environment.set('resourceId', response.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"New\",\n  \"preview\": \"Hi\",\n  \"full_content\": \"Content\",\n  \"character\": \"Holmes\",\n  \"chat_type\": \"roleplay\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/chats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"chats"
+							]
+						},
+						"description": "Creates a new chat."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"body": "{\n  \"message\": \"Chat saved\",\n  \"id\": \"60f1b\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Chat by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/chats/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"chats",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{resourceId}}",
+									"description": "Target Chat ID"
+								}
+							]
+						},
+						"description": "Gets a specific chat by Mongo ObjectId."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n  \"id\": \"60f\",\n  \"title\": \"hello\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Chat by ID",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Updated\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/chats/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"chats",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{resourceId}}",
+									"description": "Target ID"
+								}
+							]
+						},
+						"description": "Updates a specific chat."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n  \"message\": \"Chat updated\",\n  \"id\": \"60f\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete Chat by ID",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/chats/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"chats",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{resourceId}}",
+									"description": "Target ID"
+								}
+							]
+						},
+						"description": "Deletes a specific chat."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n  \"message\": \"Deleted\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Send Message (OpenRouter API Wrapper)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"model\": \"openai/gpt-3.5-turbo\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"hello\"\n    }\n  ],\n  \"temperature\": 0.7,\n  \"apiKey\": \"{{access_token}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/chat",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"chat"
+							]
+						},
+						"description": "Calls OpenRouter API using internal Next.js wrapper. Requires `model`, `messages`, `temperature`, and `apiKey`."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n  \"choices\": [\n    {\n      \"message\": {\n        \"content\": \"Hi there\"\n      }\n    }\n  ]\n}"
+						}
+					]
+				}
+			]
+		}
+	],
 	"auth": {
 		"type": "bearer",
 		"bearer": [
